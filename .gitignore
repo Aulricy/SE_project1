@@ -30,3 +30,13 @@ Thumbs.db
 
 # Local course submission copies, kept outside future source control
 提交材料/
+
+# Local reports, submission archives and inherited lab2 working materials
+/实验报告*.pdf
+/*.docx
+/*.zip
+/report.md
+/report-assets/
+/工作资料/
+/UI界面/
+/目录说明.txt

@@ -1,14 +1,19 @@
 # 二手交易平台 · 实验三
 
-本地 Python Web 项目，承接实验二的五模块设计。
+本分支保存实验三的 Python Web 源码及实验二最终 UML，承接用户权限、商品管理、预约交易、交易统计和操作日志五个模块。
 
-- 程序、依赖和运行说明：[code/README.md](code/README.md)
-- 已实现：用户与权限、商品管理、买家预约、卖家确认、双方取消/拒绝、买家完成及个人预约历史。
 - 技术栈：Python 3.12、Flask、SQLAlchemy、SQLite、Jinja2。
-- 商品实现与验证：[code/docs/products.md](code/docs/products.md)。
-- 预约规则与核验：[code/docs/reservations.md](code/docs/reservations.md)。
-- 已实现管理员违规屏蔽/恢复、交易统计及全平台只读操作日志查询，屏蔽联动取消预约。
-- 管理员规则与核验：[code/docs/admin.md](code/docs/admin.md)。
-- 最新整体核对、修复与验证：[code/docs/acceptance.md](code/docs/acceptance.md)。
-- 本地提交副本已整理到 `提交材料/`，包含 UML、干净源码、运行说明和文件清单；该目录被 Git 忽略。
-- 实验报告由本人添加；最终 ZIP 与 Git 托管仍待后续。所有改动保留在本地，未同步 GitHub。
+- [首次运行说明](运行说明.md)：安装依赖、生成本机密钥、初始化管理员和启动程序。
+- [详细开发说明](code/README.md)：业务入口、配置、验证命令与常见问题。
+- [整体联调与程序验收记录](code/docs/acceptance.md)：22 项需求核对、缺陷修复及实际检查结果。
+- [商品管理](code/docs/products.md)、[预约与交易](code/docs/reservations.md)、[管理员功能](code/docs/admin.md)。
+- `UML/`：5 份 PlantUML 源码及 5 张对应 PNG。
+- `code/`：应用、页面模板、静态资源、依赖锁文件、配置示例、测试和验收工具。
+
+## Git 仓库与课程提交材料
+
+Git 版本保留源码、UML 和必要说明；实验报告、提交 ZIP、截图及实验二工作材料在本地单独保管，不纳入本分支当前文件树。旧材料仍保留在实验二分支和历史提交中。
+
+[提交检查清单](提交检查清单.md)记录此前整理的课程提交副本；其中的目录名称和文件清单指原提交副本，不代表当前 Git 目录。报告 PDF 和最终 ZIP 待单独完成。
+
+`.env`、虚拟环境、运行数据库、上传图片和缓存不加入版本管理。`.env.example` 仅为配置示例，没有默认管理员账号或密码；首次运行请按运行说明设置。
