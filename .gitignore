@@ -40,3 +40,6 @@ Thumbs.db
 /工作资料/
 /UI界面/
 /目录说明.txt
+
+# Explicitly publish the final lab3 report; other local reports remain ignored
+!/实验报告.pdf
