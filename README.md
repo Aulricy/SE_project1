@@ -1,39 +1,14 @@
-# 二手交易平台 实验二
+# 二手交易平台 · 实验三
 
-软件工程实验二：软件设计与建模。姓名：胥松恒，学号：241220054。
+本地 Python Web 项目，承接实验二的五模块设计。
 
-本分支保存实验二成果。实验一需求保留在同一仓库的 [lab1 分支](https://github.com/Aulricy/SE_project/tree/lab1)，需求依据为 [lab1-final 标签](https://github.com/Aulricy/SE_project/tree/lab1-final)。
-
-## 查看成果
-
-- [实验报告](实验报告.pdf)：35页，包括模块划分、UML、界面设计、需求对应及AI使用过程。
-- [最终提交包](实验2_241220054_胥松恒.zip)：包含报告、5份PlantUML源码、5张UML图片和67张界面图片，共78个文件。
-- [UML](UML/)：类图、组件图、两张活动图、一张时序图，共四种UML类型。
-- [UI界面](UI界面/)：按01至67编号的界面与状态图片。
-- [可编辑报告](工作资料/实验报告.docx)。
-- [界面源文件](工作资料/UI源文件/原型/)：HTML交互原型及draw.io源文件。
-
-## 设计范围
-
-平台包含用户与权限、商品管理、预约与交易、交易统计、操作日志五个模块。采用同一Web应用和共享关系数据库的设计，交易在线下付款和交付。
-
-当前交付为设计成果和离线交互原型，真实服务端、数据库持久化、事务与并发控制仍待后续实现。原型演示账号及样例数据不能替代真实身份认证和业务数据。
-
-## 修改记录与验证
-
-Git保留本次工作目录建立基线后的实际修改记录，早期设计原稿和已保存的diff位于工作资料。文件生成、修改和核验由AI执行，用户提出需求、反馈和设计取舍；报告中保留实际参与说明。
-
-- [提交包核验结果](工作资料/提交包核验结果.json)：已实际解压并检查78个文件的SHA256、报告页数及72张PNG可读性。
-- [报告定稿核验](工作资料/报告编写/报告定稿核验.json)。
-- [UI工具核验](工作资料/UI工具核验/UI工具核验结果.json)。
-- [整体核对](工作资料/整体核对/)。
-
-本次同步保留实验一分支和标签，通过`lab2`分支与`lab2-final`标签查看实验二。
-
-```sh
-git clone --branch lab2 https://github.com/Aulricy/SE_project.git
-git log --oneline
-git show lab2-final
-```
-
-最终ZIP已核验；课程平台提交仍需另行完成。
+- 程序、依赖和运行说明：[code/README.md](code/README.md)
+- 已实现：用户与权限、商品管理、买家预约、卖家确认、双方取消/拒绝、买家完成及个人预约历史。
+- 技术栈：Python 3.12、Flask、SQLAlchemy、SQLite、Jinja2。
+- 商品实现与验证：[code/docs/products.md](code/docs/products.md)。
+- 预约规则与核验：[code/docs/reservations.md](code/docs/reservations.md)。
+- 已实现管理员违规屏蔽/恢复、交易统计及全平台只读操作日志查询，屏蔽联动取消预约。
+- 管理员规则与核验：[code/docs/admin.md](code/docs/admin.md)。
+- 最新整体核对、修复与验证：[code/docs/acceptance.md](code/docs/acceptance.md)。
+- 本地提交副本已整理到 `提交材料/`，包含 UML、干净源码、运行说明和文件清单；该目录被 Git 忽略。
+- 实验报告由本人添加；最终 ZIP 与 Git 托管仍待后续。所有改动保留在本地，未同步 GitHub。

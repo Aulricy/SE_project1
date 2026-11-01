@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}我的预约 · 二手交易平台{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>我的预约</h1><p class="subtitle">查看本人买入预约与商品收到的预约，历史记录持续保留。</p></div></div>
+<nav class="reservation-tabs" aria-label="预约记录类型">
+  <a class="button {{ 'secondary' if query.side != 'buying' else '' }}" href="{{ url_for('reservations.list_records', side='buying') }}">买入记录</a>
+  <a class="button {{ 'secondary' if query.side != 'selling' else '' }}" href="{{ url_for('reservations.list_records', side='selling') }}">卖出记录</a>
+</nav>
+<section class="panel filters">
+  <form method="get" class="filter-grid">
+    <input type="hidden" name="side" value="{{ query.side }}">
+    <div class="form-group"><label for="reservation-status">预约状态</label><select id="reservation-status" name="status">
+      <option value="">全部状态</option>
+      {% for value,label in status_options %}<option value="{{ value }}" {% if values.get('status') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select></div>
+    <div class="form-group"><label for="product-id">商品编号</label><input id="product-id" name="product_id" value="{{ values.get('product_id', '') }}" inputmode="numeric"></div>
+    <div class="filter-actions"><button class="button" type="submit">查询</button>
+      <a href="{{ url_for('reservations.list_records', side=query.side) }}">重置</a></div>
+  </form>
+</section>
+{% if query_error %}<p class="notice error" role="alert">{{ query_error }}</p>{% endif %}
+<p class="result-count">共 {{ page.total }} 条{{ "买入" if query.side == "buying" else "卖出" }}记录</p>
+<section class="panel table-wrap">
+<table>
+  <thead><tr><th scope="col">商品</th><th scope="col">预约编号</th><th scope="col">预约时价格</th>
+    <th scope="col">状态</th><th scope="col">{{ "卖家" if query.side == "buying" else "买家" }}</th>
+    <th scope="col">预约时间（北京时间）</th><th scope="col">操作</th></tr></thead>
+  <tbody>{% for record in page.items %}
+    <tr><td>{{ record.reservation.reserved_name }}</td><td>{{ record.reservation.id }}</td>
+      <td>{{ "¥%.2f"|format(record.reservation.reserved_price) }}</td>
+      <td>{{ record.reservation.status.label }}</td>
+      <td>{{ record.seller_name if query.side == "buying" else record.buyer_name }}</td>
+      <td>{{ record.reservation.created_at|beijing_time }}</td>
+      <td><a href="{{ url_for('reservations.detail', reservation_id=record.reservation.id) }}">查看详情</a></td></tr>
+    {% else %}<tr><td colspan="7">暂无符合条件的预约记录。</td></tr>{% endfor %}
+  </tbody>
+</table>
+</section>
+<nav class="pagination" aria-label="预约分页">
+  {% if previous_url %}<a class="button secondary" href="{{ previous_url }}">上一页</a>{% endif %}
+  <span>第 {{ page.page }} / {{ page.pages }} 页</span>
+  {% if next_url %}<a class="button secondary" href="{{ next_url }}">下一页</a>{% endif %}
+</nav>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}我的账号 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="panel account-panel">
+  <span class="badge">{{ "首个管理员" if is_initial_admin else
+    ("管理员" if current_user.role == UserRole.ADMIN else "普通用户") }}</span>
+  <h1>我的账号</h1>
+  <dl class="details">
+    <div><dt>用户名</dt><dd>{{ current_user.username }}</dd></div>
+    <div><dt>账号编号</dt><dd>{{ current_user.id }}</dd></div>
+    <div><dt>创建时间</dt><dd>{{ current_user.created_at|beijing_time }}（北京时间）</dd></div>
+  </dl>
+  {% if current_user.role == UserRole.MEMBER %}
+  <p class="subtitle">同一账号可作为买家或卖家使用。</p>
+  {% else %}
+  <a class="button" href="{{ url_for('auth.admin_dashboard') }}">进入管理后台</a>
+  {% endif %}
+</section>
+{% endblock %}

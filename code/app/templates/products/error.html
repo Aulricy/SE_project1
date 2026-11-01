@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}商品操作未完成 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>商品操作未完成</h1><p role="alert">{{ message }}</p>
+  <div class="section-actions">
+    <a class="button" href="{{ request.path.rsplit('/actions/', 1)[0] if '/actions/' in request.path else url_for('products.catalog') }}">返回并刷新页面</a>
+  </div>
+</section>
+{% endblock %}

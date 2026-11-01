@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}操作日志 · 二手交易平台{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>操作日志</h1><p>组合查询关键操作，核对处理人、对象和前后状态。</p></div><span class="badge">只读记录</span></div>
+{% include "admin/_nav.html" %}
+<section class="panel filters"><form method="get" class="filter-grid admin-filters">
+{% for name, label in [('start', '开始时间（北京时间）'), ('end', '结束时间（北京时间）')] %}
+<div class="form-group"><label for="{{ name }}">{{ label }}</label><input id="{{ name }}" name="{{ name }}" type="datetime-local" step="1" value="{{ values.get(name, '') }}"></div>
+{% endfor %}
+<div class="form-group"><label for="operator">操作人</label><input id="operator" name="operator" maxlength="100" placeholder="用户名或用户编号，精确匹配" value="{{ values.get('operator', '') }}"></div>
+<div class="form-group"><label for="type">操作类型</label><select id="type" name="type"><option value="">全部类型</option>{% for kind in operation_types %}<option value="{{ kind.value }}" {% if values.get('type') == kind.value %}selected{% endif %}>{{ kind.label }}</option>{% endfor %}</select></div>
+{% for name, label in [('product_id', '商品编号'), ('reservation_id', '预约编号')] %}
+<div class="form-group"><label for="{{ name }}">{{ label }}</label><input id="{{ name }}" name="{{ name }}" inputmode="numeric" value="{{ values.get(name, '') }}"></div>
+{% endfor %}
+<div class="filter-actions"><button class="button" type="submit">查询日志</button><a href="{{ url_for('admin.logs') }}">重置</a></div>
+</form><p class="policy">非空条件须同时满足；包含所填起止秒，留空表示不限制该端时间。日志不可修改或删除。</p>
+{% if query_error %}<p class="notice error" role="alert">{{ query_error }} 请修改后重新查询。</p>{% endif %}
+</section>
+{% if page is not none %}
+<p class="result-count">共 {{ page.total }} 条日志 · 按操作时间从新到旧</p>
+<section class="panel"><div class="table-wrap"><table>
+<thead><tr><th>时间（北京时间）</th><th>操作人</th><th>操作类型</th><th>商品 / 预约</th><th>商品状态</th><th>详情</th></tr></thead>
+<tbody>{% for record in page.items %}{% set item = record.log %}<tr>
+<td>{{ item.operated_at|beijing_time(true) }}</td><td class="wrapping-cell">{{ record.operator_name }}（{{ item.operator_id }}）</td><td class="wrapping-cell">{{ item.operation_type.label }}</td><td>{{ item.product_id }} / {{ item.reservation_id or '—' }}</td><td>{{ item.product_status_before.label }} → {{ item.product_status_after.label }}</td><td><a href="{{ url_for('admin.log_detail', log_id=item.id) }}">查看详情</a></td>
+</tr>{% else %}<tr><td colspan="6">没有符合条件的操作日志。</td></tr>{% endfor %}</tbody>
+</table></div>{% set paging = page %}{% include "admin/_pagination.html" %}</section>
+{% endif %}
+{% endblock %}

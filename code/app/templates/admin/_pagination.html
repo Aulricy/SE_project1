@@ -1,0 +1,5 @@
+<nav class="pagination" aria-label="查询结果分页">
+  {% if previous_url %}<a href="{{ previous_url }}">上一页</a>{% endif %}
+  <span>第 {{ paging.page }} / {{ paging.pages }} 页 · 共 {{ paging.total }} 条</span>
+  {% if next_url %}<a href="{{ next_url }}">下一页</a>{% endif %}
+</nav>

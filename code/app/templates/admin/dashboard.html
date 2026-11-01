@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}管理后台 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="panel">
+  <span class="badge">管理员</span>
+  <h1>管理后台</h1>
+  <p>欢迎，{{ current_user.username }}。</p>
+  <div class="section-actions"><a class="button" href="{{ url_for('products.admin') }}">商品审核与管理</a></div>
+  {% if is_initial_admin %}
+  <div class="section-actions">
+    <a class="button" href="{{ url_for('auth.admin_accounts') }}">管理员账号</a>
+  </div>
+  {% endif %}
+  <div class="section-actions">
+    <a class="button secondary" href="{{ url_for('admin.statistics') }}">交易统计</a>
+    <a class="button secondary" href="{{ url_for('admin.logs') }}">操作日志</a>
+  </div>
+  <p class="policy">屏蔽有有效预约的商品时，系统一并取消预约。恢复后须重新审核。</p>
+</section>
+{% endblock %}

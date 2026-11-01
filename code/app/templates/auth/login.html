@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "auth/_fields.html" import field %}
+{% block title %}登录 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>欢迎回来</h1>
+  <p class="subtitle">普通用户与管理员使用同一登录入口。</p>
+  <form method="post" action="{{ url_for('auth.login') }}">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="next" value="{{ destination }}">
+    {{ field(form.username, "username") }}
+    {{ field(form.password, "current-password") }}
+    {% if form_error %}<p class="notice error" role="alert">{{ form_error }}</p>{% endif %}
+    <button class="button wide" type="submit">登录</button>
+  </form>
+  <p class="form-switch">还没有账号？<a href="{{ url_for('auth.register') }}">创建账号</a></p>
+</section>
+{% endblock %}

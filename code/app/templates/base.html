@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}二手交易平台{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('main.index') }}">二手交易平台</a>
+    <nav class="account-nav" aria-label="账号导航">
+      <a href="{{ url_for('products.catalog') }}">商品大厅</a>
+    {% if current_user %}
+      {% if current_user.role == UserRole.MEMBER %}
+      <a href="{{ url_for('products.own') }}">我的商品</a>
+      <a href="{{ url_for('reservations.list_records') }}">我的预约</a>
+      <a href="{{ url_for('products.create') }}">发布商品</a>
+      {% endif %}
+      <a href="{{ url_for('auth.account') }}">{{ current_user.username }}</a>
+      {% if current_user.role == UserRole.ADMIN %}
+      <a href="{{ url_for('auth.admin_dashboard') }}">管理后台</a>
+      {% endif %}
+      {% if is_initial_admin %}
+      <a href="{{ url_for('auth.admin_accounts') }}">管理员账号</a>
+      {% endif %}
+      <form action="{{ url_for('auth.logout') }}" method="post" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="link-button">退出登录</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}">登录</a>
+      <a class="button small" href="{{ url_for('auth.register') }}">创建账号</a>
+    {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="notice {{ category }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

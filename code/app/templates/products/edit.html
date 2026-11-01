@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "auth/_fields.html" import field %}
+{% block title %}{{ "编辑商品草稿" if product else "发布商品" }} · 二手交易平台{% endblock %}
+{% block content %}
+<section class="panel product-editor">
+  <a href="{{ url_for('products.own') }}">← 返回我的商品</a>
+  <h1>{{ "编辑商品草稿" if product else "发布商品" }}</h1>
+  <p class="subtitle">可先保存不完整草稿。提交审核时，名称、分类、价格和描述须填写完整。</p>
+  <form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    {{ field(form.name, "off") }}
+    <div class="editor-row">{{ field(form.category, "off") }}{{ field(form.price, "off") }}</div>
+    {{ field(form.description, "off") }}
+    <p class="hint">请在描述中填写成色、联系方式与交付说明。发布后将原文公开展示，平台不核实联系方式。</p>
+    {{ field(form.image, "off") }}
+    <p class="hint">最多一张 JPG、PNG 或 WebP，3 MB 以内；图片可不上传。发生表单错误后，请重新选择图片。</p>
+    {% if product and product.image_path %}
+      <img class="editing-image" src="{{ url_for('products.image', product_id=product.id) }}" alt="当前商品图片">
+      <label class="remove-image">{{ form.remove_image() }} {{ form.remove_image.label.text }}</label>
+    {% endif %}
+    {% if form.version.errors %}<p class="notice error" role="alert">{{ form.version.errors|join(' ') }}</p>{% endif %}
+    {% if form_error %}<p class="notice error" role="alert">{{ form_error }}</p>{% endif %}
+    <div class="section-actions">
+      <button class="button secondary" type="submit" name="intent" value="save">保存草稿</button>
+      <button class="button" type="submit" name="intent" value="submit">提交审核</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

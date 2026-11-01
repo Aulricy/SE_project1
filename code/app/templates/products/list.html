@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ {"public": "商品大厅", "own": "我的商品", "admin": "商品审核与管理"}[scope] }} · 二手交易平台{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><h1>{{ {"public": "商品大厅", "own": "我的商品", "admin": "商品审核与管理"}[scope] }}</h1>
+    <p class="subtitle">{{ "浏览已发布商品，线下自行联系与交付。" if scope == "public" else
+      ("管理自己的商品草稿与发布状态。" if scope == "own" else "审核待发布商品，并按状态查询全部商品。") }}</p></div>
+  {% if current_user and current_user.role == UserRole.MEMBER %}
+  <a class="button" href="{{ url_for('products.create') }}">发布商品</a>
+  {% endif %}
+</div>
+<section class="panel filters">
+  <form method="get" class="filter-grid">
+    <div class="form-group"><label for="keyword">商品名称</label>
+      <input id="keyword" name="keyword" value="{{ values.get('keyword', '') }}" maxlength="100" placeholder="输入关键词"></div>
+    <div class="form-group"><label for="category">分类</label><select id="category" name="category">
+      <option value="">全部分类</option>
+      {% for value, label in category_options %}
+      <option value="{{ value }}" {% if values.get('category') == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}</select></div>
+    <div class="form-group"><label for="min_price">最低价格（元）</label>
+      <input id="min_price" name="min_price" inputmode="decimal" value="{{ values.get('min_price', '') }}"></div>
+    <div class="form-group"><label for="max_price">最高价格（元）</label>
+      <input id="max_price" name="max_price" inputmode="decimal" value="{{ values.get('max_price', '') }}"></div>
+    {% if scope != "public" %}
+    <div class="form-group"><label for="status">商品状态</label><select id="status" name="status">
+      <option value="">全部状态</option>
+      {% for value, label in status_options %}
+      <option value="{{ value }}" {% if values.get('status') == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}</select></div>
+    {% endif %}
+    <div class="filter-actions"><button class="button" type="submit">查询</button>
+      <a href="{{ url_for('products.catalog' if scope == 'public' else 'products.own' if scope == 'own' else 'products.admin') }}">重置</a></div>
+  </form>
+</section>
+{% if query_error %}<p class="notice error" role="alert">{{ query_error }}</p>{% endif %}
+<p class="result-count">共 {{ page.total }} 件商品{% if scope == "public" %} · 按最近发布时间排序{% endif %}</p>
+<div class="product-grid">
+{% for record in page.items %}{% set product = record.product %}
+<article class="product-card">
+  <a class="product-picture" href="{{ url_for('products.detail', product_id=product.id) }}">
+    {% if product.image_path %}
+    <img src="{{ url_for('products.image', product_id=product.id) }}" alt="{{ product.name or '商品图片' }}" loading="lazy">
+    {% else %}<span class="image-placeholder">暂无图片</span>{% endif %}
+  </a>
+  <div class="product-body">
+    <span class="badge">{{ product.status.label }}</span>
+    <h2><a href="{{ url_for('products.detail', product_id=product.id) }}">{{ product.name or "未命名草稿" }}</a></h2>
+    <div class="product-meta"><strong class="price">{{ "¥%.2f"|format(product.price) if product.price is not none else "价格待填写" }}</strong>
+      <span>{{ product.category.label if product.category else "分类待填写" }}</span></div>
+    <p class="hint">卖家：{{ record.seller_name }} · 编号 {{ product.id }}</p>
+  </div>
+</article>
+{% else %}
+<section class="panel empty-state"><h2>暂无符合条件的商品</h2><p>可以调整查询条件后再试。</p></section>
+{% endfor %}
+</div>
+<nav class="pagination" aria-label="商品分页">
+  {% if previous_url %}<a class="button secondary" href="{{ previous_url }}">上一页</a>{% endif %}
+  <span>第 {{ page.page }} / {{ page.pages }} 页</span>
+  {% if next_url %}<a class="button secondary" href="{{ next_url }}">下一页</a>{% endif %}
+</nav>
+{% endblock %}

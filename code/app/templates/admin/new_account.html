@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "auth/_fields.html" import field %}
+{% block title %}批准并设置管理员 · 二手交易平台{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin-account.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="auth-card admin-form">
+  <a href="{{ url_for('auth.admin_accounts') }}">← 返回管理员账号</a>
+  <h1>批准并设置管理员</h1>
+  <p class="subtitle">本次批准人：{{ current_user.username }}（首个管理员）</p>
+  <form id="admin-account-form" method="post" action="{{ url_for('auth.new_admin') }}">
+    {{ form.hidden_tag() }}
+    {{ field(form.username, "off") }}
+    {{ field(form.password, "new-password") }}
+    <p class="hint">密码为 8–128 个字符，不能全部为空白。</p>
+    {{ field(form.confirm, "new-password") }}
+    <p class="fixed-role">账号身份：<strong>管理员（固定）</strong></p>
+    <div class="approval">
+      <label>{{ form.approved() }} {{ form.approved.label.text }}</label>
+      {% for error in form.approved.errors %}<p class="field-errors" role="alert">{{ error }}</p>{% endfor %}
+    </div>
+    {% if form_error %}<p class="notice error" role="alert">{{ form_error }}</p>{% endif %}
+    <button class="button wide" type="submit">批准并设置</button>
+  </form>
+  <p class="policy">新增管理员可处理管理业务，但无权继续增设管理员。</p>
+</section>
+<dialog id="approval-dialog" aria-labelledby="approval-title">
+  <h2 id="approval-title">确认批准并设置？</h2>
+  <p>将为 <strong id="approval-username"></strong> 创建管理员账号。</p>
+  <p class="hint">该账号将使用统一登录入口。</p>
+  <div class="dialog-actions">
+    <button type="button" class="button secondary" id="cancel-approval">返回修改</button>
+    <button type="button" class="button" id="confirm-approval">确认批准并设置</button>
+  </div>
+</dialog>
+{% endblock %}

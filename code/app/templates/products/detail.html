@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% macro operation_form(operation, label, prompt) %}
+<form method="post" action="{{ url_for('products.action', product_id=product.id, operation=operation) }}" class="product-operation" data-confirm="{{ prompt }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="version" value="{{ action_version if failed_operation == operation else product.version }}">
+  <button class="button {% if operation != 'approve' %}secondary{% endif %}" type="submit">{{ label }}</button>
+</form>
+{% endmacro %}
+{% block title %}{{ product.name or "未命名草稿" }} · 二手交易平台{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/product-actions.js') }}" defer></script>{% endblock %}
+{% block content %}
+<a href="{{ url_for('products.own' if is_owner else 'products.admin' if can_review else 'products.catalog') }}">← 返回商品列表</a>
+<section class="panel product-detail">
+  {% if action_error %}<p class="notice error" role="alert">{{ action_error }} 已保留本次输入；状态变化时请刷新后重新操作。</p><p><a href="{{ url_for('products.detail', product_id=product.id) }}">刷新商品详情</a></p>
+  {% if failed_operation == 'block' and product.status in [ProductStatus.BLOCKED, ProductStatus.COMPLETED] %}<p class="product-description">本次屏蔽原因：{{ action_reason }}</p>{% endif %}
+  {% if failed_operation == 'reject' and product.status != ProductStatus.PENDING_REVIEW %}<p class="product-description">本次驳回原因：{{ action_reason }}</p>{% endif %}
+  {% endif %}
+  <div class="detail-top">
+    <div class="detail-picture">
+      {% if product.image_path %}<img src="{{ url_for('products.image', product_id=product.id) }}" alt="{{ product.name or '商品图片' }}">
+      {% else %}<span class="image-placeholder">暂无图片</span>{% endif %}
+    </div>
+    <div>
+      <span class="badge">{{ product.status.label }}</span>
+      <h1>{{ product.name or "未命名草稿" }}</h1>
+      <p class="detail-price price">{{ "¥%.2f"|format(product.price) if product.price is not none else "价格待填写" }}</p>
+      <dl class="details">
+        <div><dt>商品分类</dt><dd>{{ product.category.label if product.category else "未填写" }}</dd></div>
+        <div><dt>卖家</dt><dd>{{ record.seller_name }}</dd></div>
+        <div><dt>商品编号</dt><dd>{{ product.id }}</dd></div>
+        {% if product.published_at %}<div><dt>最近发布时间</dt><dd>{{ product.published_at|beijing_time }}（北京时间）</dd></div>{% endif %}
+      </dl>
+    </div>
+  </div>
+  {% if (is_owner or can_review) and product.latest_reject_reason %}
+  <p class="notice info"><strong>最近一次驳回原因：</strong>{{ product.latest_reject_reason }}</p>
+  {% endif %}
+  {% if (is_owner or can_review) and product.latest_block_reason %}
+  <p class="notice info"><strong>最近一次屏蔽原因：</strong>{{ product.latest_block_reason }}</p>
+  {% endif %}
+  <h2>商品描述</h2><p class="product-description">{{ product.description or "尚未填写商品描述。" }}</p>
+  <div class="operation-bar">
+  {% if is_owner %}
+    {% if product.status == ProductStatus.DRAFT %}
+    <a class="button" href="{{ url_for('products.edit', product_id=product.id) }}">编辑草稿</a>
+    {{ operation_form("submit", "提交审核", "提交后须先撤回才能修改，确认提交审核？") }}
+    {% elif product.status == ProductStatus.PENDING_REVIEW %}
+    {{ operation_form("withdraw", "撤回草稿", "撤回后可继续编辑，确认撤回审核？") }}
+    {% elif product.status == ProductStatus.PUBLISHED %}
+    {{ operation_form("take-down", "下架商品", "下架后不再公开展示，再次发布需重新审核。确认下架？") }}
+    {{ operation_form("return-draft", "退回草稿后修改", "商品将退出公开展示，修改后需重新审核。确认退回草稿？") }}
+    {% elif product.status == ProductStatus.OFF_SHELF %}
+    {{ operation_form("return-draft", "退回草稿后修改", "再次发布需进入草稿并重新审核。确认退回草稿？") }}
+    {% else %}<p>当前状态不可直接修改或下架。</p>{% endif %}
+  {% endif %}
+  {% if is_owner %}
+    <a class="button secondary" href="{{ url_for('reservations.list_records', side='selling', product_id=product.id) }}">查看商品预约记录</a>
+  {% elif product.status == ProductStatus.PUBLISHED %}
+    {% if current_user and current_user.role == UserRole.MEMBER %}
+    <form method="post" action="{{ url_for('reservations.reserve', product_id=product.id) }}" class="product-operation" data-confirm="预约仅表示购买意向，不产生线上付款。确认后等待卖家处理，是否确认预约？">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="version" value="{{ product.version }}">
+      <input type="hidden" name="request_key" value="{{ reserve_key }}">
+      <button class="button" type="submit">立即预约</button>
+    </form>
+    {% elif not current_user %}
+    <a class="button" href="{{ url_for('auth.login', next=url_for('products.detail', product_id=product.id)) }}">登录后预约</a>
+    {% endif %}
+  {% endif %}
+  {% if can_review and product.status == ProductStatus.PENDING_REVIEW %}
+    {{ operation_form("approve", "审核通过", "审核通过后商品将公开展示，确认发布？") }}
+    <form method="post" action="{{ url_for('products.action', product_id=product.id, operation='reject') }}" class="product-operation rejection-form" data-confirm="确认驳回并将商品退回草稿？">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="version" value="{{ action_version if failed_operation == 'reject' else product.version }}">
+      <label for="reason">驳回原因（必填）</label>
+      <textarea id="reason" name="reason" required maxlength="1000" rows="3">{{ action_reason if failed_operation == 'reject' else '' }}</textarea>
+      <button class="button secondary" type="submit">驳回并退回草稿</button>
+    </form>
+  {% endif %}
+  {% if can_review %}
+    {% if product.status == ProductStatus.BLOCKED %}
+    {{ operation_form("restore", "恢复为草稿", "商品将退回草稿，旧预约不会恢复；修改后需重新提交审核。确认恢复？") }}
+    {% elif product.status != ProductStatus.COMPLETED %}
+    <form method="post" action="{{ url_for('products.action', product_id=product.id, operation='block') }}" class="product-operation rejection-form" data-confirm="确认屏蔽该商品？如有待确认或已确认预约，将一并取消并向买卖双方显示原因。">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="version" value="{{ action_version if failed_operation == 'block' else product.version }}">
+      <label for="block-reason">屏蔽原因（必填，买卖双方可查看）</label>
+      <textarea id="block-reason" name="reason" required maxlength="1000" rows="3">{{ action_reason if failed_operation == 'block' else '' }}</textarea>
+      <button class="button secondary" type="submit">屏蔽商品并取消有效预约</button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('admin.logs', product_id=product.id) }}">查看此商品操作日志</a>
+  {% endif %}
+  </div>
+</section>
+<dialog id="product-confirmation" aria-labelledby="confirmation-title">
+  <h2 id="confirmation-title">确认商品操作</h2><p id="confirmation-message"></p>
+  <div class="dialog-actions">
+    <button class="button secondary" type="button" id="cancel-operation">暂不操作</button>
+    <button class="button" type="button" id="confirm-operation">确认操作</button>
+  </div>
+</dialog>
+{% endblock %}

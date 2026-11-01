@@ -1,0 +1,15 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+[tool.pylint.main]
+py-version = "3.12"
+ignore = [".venv", "instance"]
+persistent = false
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.messages_control]
+disable = ["too-few-public-methods"]

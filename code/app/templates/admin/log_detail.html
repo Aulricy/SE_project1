@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% set item = record.log %}
+{% block title %}日志详情 · 二手交易平台{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.logs') }}">← 返回操作日志</a>
+<section class="panel product-detail"><span class="badge">只读记录</span><h1>日志 {{ item.id }} · {{ item.operation_type.label }}</h1>
+<dl class="details reservation-details">
+<div><dt>操作时间</dt><dd>{{ item.operated_at|beijing_time(true) }}（北京时间）</dd></div>
+<div><dt>操作人</dt><dd>{{ record.operator_name }}（用户编号 {{ item.operator_id }}）</dd></div>
+<div><dt>商品编号</dt><dd><a href="{{ url_for('products.detail', product_id=item.product_id) }}">{{ item.product_id }}</a></dd></div>
+<div><dt>商品状态</dt><dd>{{ item.product_status_before.label }} → {{ item.product_status_after.label }}</dd></div>
+{% if item.reservation_id %}
+<div><dt>预约编号</dt><dd>{{ item.reservation_id }}</dd></div>
+<div><dt>预约状态</dt><dd>{{ item.reservation_status_before.label if item.reservation_status_before else '未建立' }} → {{ item.reservation_status_after.label if item.reservation_status_after else '—' }}</dd></div>
+{% endif %}
+<div><dt>处理原因</dt><dd class="product-description">{{ item.reason or '不适用' }}</dd></div>
+</dl>
+<p class="policy">此记录保存操作发生时的状态；后续操作不会覆盖本条历史。</p>
+</section>
+{% endblock %}

@@ -1,0 +1,6 @@
+<nav class="reservation-tabs" aria-label="管理功能">
+  <a href="{{ url_for('products.admin', status='') }}">全部商品</a>
+  <a href="{{ url_for('products.admin') }}">待审核商品</a>
+  <a href="{{ url_for('admin.statistics') }}">交易统计</a>
+  <a href="{{ url_for('admin.logs') }}">操作日志</a>
+</nav>

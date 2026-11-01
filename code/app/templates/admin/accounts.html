@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}管理员账号 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="page-heading">
+    <div><h1>管理员账号</h1><p class="subtitle">仅首个管理员可批准并设置后续管理员。</p></div>
+    <a class="button" href="{{ url_for('auth.new_admin') }}">批准并设置账号</a>
+  </div>
+  <div class="table-wrap">
+  <table>
+    <caption>共 {{ accounts|length }} 个管理员账号</caption>
+    <thead><tr><th scope="col">用户名</th><th scope="col">账号编号</th>
+      <th scope="col">身份</th><th scope="col">设置方式</th><th scope="col">创建时间（北京时间）</th></tr></thead>
+    <tbody>
+    {% for account in accounts %}
+    <tr>
+      <td>{{ account.username }}</td><td>{{ account.id }}</td>
+      <td>{{ "首个管理员" if account.id == current_user.id else "管理员" }}</td>
+      <td>{{ "平台预置" if account.id == current_user.id else "经首个管理员批准" }}</td>
+      <td>{{ account.created_at|beijing_time }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <p class="policy">已被使用的用户名不能用于新建管理员账号，普通账号不会被直接升级。</p>
+</section>
+{% endblock %}

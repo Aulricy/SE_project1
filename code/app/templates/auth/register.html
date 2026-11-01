@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "auth/_fields.html" import field %}
+{% block title %}创建账号 · 二手交易平台{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <h1>创建账号</h1>
+  <p class="subtitle">一个普通账号，既能买也能卖。</p>
+  <form method="post" action="{{ url_for('auth.register') }}">
+    {{ form.hidden_tag() }}
+    {{ field(form.username, "username") }}
+    {{ field(form.password, "new-password") }}
+    <p class="hint">密码为 8–128 个字符，不能全部为空白。</p>
+    {{ field(form.confirm, "new-password") }}
+    {% if form_error %}<p class="notice error" role="alert">{{ form_error }}</p>{% endif %}
+    <button class="button wide" type="submit">注册账号</button>
+  </form>
+  <p class="form-switch">已有账号？<a href="{{ url_for('auth.login') }}">去登录</a></p>
+  <p class="policy">普通注册仅创建普通用户账号。管理员账号须由首个管理员批准设置。</p>
+</section>
+{% endblock %}

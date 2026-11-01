@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}交易统计 · 二手交易平台{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>交易统计</h1><p>按首次成功完成的北京时间，统计已完成预约。</p></div><span class="badge">仅管理员</span></div>
+{% include "admin/_nav.html" %}
+<section class="panel filters">
+<form method="get" class="filter-grid admin-filters">
+  <div class="form-group"><label for="start">起始日期</label><input id="start" name="start" type="date" required value="{{ values.get('start', '') }}"></div>
+  <div class="form-group"><label for="end">结束日期</label><input id="end" name="end" type="date" required value="{{ values.get('end', '') }}"></div>
+  <div class="filter-actions"><button class="button" type="submit">查询统计</button><a href="{{ url_for('admin.statistics') }}">重置</a></div>
+</form>
+<p class="policy">包含起止两天；待确认、已确认但未完成及已取消预约均不计入。</p>
+{% if query_error %}<p class="notice error" role="alert">{{ query_error }} 请修改后重新查询。</p>{% endif %}
+</section>
+{% if result is not none %}
+<p class="result-count">统计区间：{{ values.start }} 至 {{ values.end }}（北京时间，含首尾日期）</p>
+<div class="metrics">
+  <section class="panel"><h2>已完成交易笔数</h2><p class="metric-value" id="completed-count">{{ result.completed_count }} <small>笔</small></p><p class="policy">每条已完成预约只计一次</p></section>
+  <section class="panel"><h2>预约价格合计</h2><p class="metric-value price" id="completed-amount">¥{{ result.formatted_amount }}</p><p class="policy">按预约时价格计算，不表示实际收款</p></section>
+</div>
+<section class="panel section-actions-table"><h2>计入本次统计的已完成预约</h2>
+{% if result.records.items %}<div class="table-wrap"><table>
+<thead><tr><th>预约编号</th><th>商品</th><th>预约价格</th><th>首次完成时间（北京时间）</th></tr></thead>
+<tbody>{% for item in result.records.items %}<tr><td>{{ item.id }}</td><td class="wrapping-cell">{{ item.reserved_name }}（商品 {{ item.product_id }}）</td><td>¥{{ '%.2f'|format(item.reserved_price) }}</td><td>{{ item.completed_at|beijing_time(true) }}</td></tr>{% endfor %}</tbody>
+</table></div>{% else %}<p class="empty-state">区间内暂无已完成预约，笔数与金额均为 0。</p>{% endif %}
+{% set paging = result.records %}{% include "admin/_pagination.html" %}
+</section>
+{% endif %}
+{% endblock %}

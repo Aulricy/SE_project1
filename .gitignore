@@ -1,11 +1,32 @@
-工作资料/工具/
-工作资料/报告编写/排版检查/
-工作资料/报告编写/插图/
-工作资料/报告编写/*前核对.json
-工作资料/界面预览/
-工作资料/临时*/
+# Python environments and generated files
+**/.venv/
 **/__pycache__/
-~$*
-*.editing.docx
-工作资料/报告编写/定稿排版检查/
-/实验2_241220054_胥松恒/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.pylint.d/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Local configuration and application data
+**/.env
+**/.env.*
+!**/.env.example
+code/instance/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Editors and OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Local course submission copies, kept outside future source control
+提交材料/
